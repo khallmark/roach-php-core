@@ -56,7 +56,7 @@ final class ProcessorTest extends TestCase
 
     public function testCallsHandlersForIncomingResponses(): void
     {
-        $handler = $this->makeHandler();
+        $handler = self::makeHandler();
         $request = $this->makeRequest(callback: static fn () => yield ParseResult::item([]));
         $response = $this->makeResponse($request);
 
@@ -70,8 +70,8 @@ final class ProcessorTest extends TestCase
 
     public function testDoesNotPassOnResponseIfDroppedByHandler(): void
     {
-        $dropHandler = $this->makeHandler(handleResponse: static fn ($response) => $response->drop('::reason::'));
-        $otherHandler = $this->makeHandler();
+        $dropHandler = self::makeHandler(handleResponse: static fn ($response) => $response->drop('::reason::'));
+        $otherHandler = self::makeHandler();
         $response = $this->makeResponse($this->makeRequest());
         $stack = $this->processor->withMiddleware($dropHandler, $otherHandler);
 
@@ -83,10 +83,10 @@ final class ProcessorTest extends TestCase
 
     public function testCallResponseHandlersInOrder(): void
     {
-        $handlerA = $this->makeHandler(static function (Response $response) {
+        $handlerA = self::makeHandler(static function (Response $response) {
             return $response->withMeta('foo', $response->getMeta('foo') . 'A');
         });
-        $handlerB = $this->makeHandler(static function (Response $response) {
+        $handlerB = self::makeHandler(static function (Response $response) {
             return $response->withMeta('foo', $response->getMeta('foo') . 'B');
         });
         $request = $this->makeRequest(callback: static function (Response $response) {
@@ -103,12 +103,8 @@ final class ProcessorTest extends TestCase
 
     public function testPassesEachNewRequestToHandlersInOrder(): void
     {
-        $handlerA = $this->makeHandler(
-            handleRequestCallback: static fn ($r) => $r->withMeta('::key::', $r->getMeta('::key::', '') . 'A'),
-        );
-        $handlerB = $this->makeHandler(
-            handleRequestCallback: static fn ($r) => $r->withMeta('::key::', $r->getMeta('::key::', '') . 'B'),
-        );
+        $handlerA = self::makeHandler(handleRequestCallback: static fn ($r) => $r->withMeta('::key::', $r->getMeta('::key::', '') . 'A'));
+        $handlerB = self::makeHandler(handleRequestCallback: static fn ($r) => $r->withMeta('::key::', $r->getMeta('::key::', '') . 'B'));
         $results = [
             ParseResult::request('GET', '::url::', static fn (Response $response) => yield from []),
             ParseResult::request('GET', '::url::', static fn (Response $response) => yield from []),
@@ -124,13 +120,11 @@ final class ProcessorTest extends TestCase
 
     public function testDoesNotPassOnRequestIfDroppedByHandler(): void
     {
-        $dropHandler = $this->makeHandler(handleRequestCallback: static function ($request, $response) {
+        $dropHandler = self::makeHandler(handleRequestCallback: static function ($request, $response) {
             return $request->drop('::reason::');
         });
-        $handlerB = $this->makeHandler();
-        $request = $this->makeRequest(
-            callback: fn () => yield ParseResult::fromValue($this->makeRequest()),
-        );
+        $handlerB = self::makeHandler();
+        $request = $this->makeRequest(callback: fn () => yield ParseResult::fromValue($this->makeRequest()));
         $stack = $this->processor->withMiddleware($dropHandler, $handlerB);
 
         $result = \iterator_to_array($stack->handle($this->makeResponse($request)));
@@ -141,12 +135,8 @@ final class ProcessorTest extends TestCase
 
     public function testCallsItemHandlersInOrderForOutgoingItems(): void
     {
-        $handlerA = $this->makeHandler(
-            handleItemCallback: static fn ($item) => $item->set('::key::', $item->get('::key::', '') . 'A'),
-        );
-        $handlerB = $this->makeHandler(
-            handleItemCallback: static fn ($item) => $item->set('::key::', $item->get('::key::', '') . 'B'),
-        );
+        $handlerA = self::makeHandler(handleItemCallback: static fn ($item) => $item->set('::key::', $item->get('::key::', '') . 'A'));
+        $handlerB = self::makeHandler(handleItemCallback: static fn ($item) => $item->set('::key::', $item->get('::key::', '') . 'B'));
         $request = $this->makeRequest(callback: static function (Response $response) {
             yield ParseResult::item([]);
         });
@@ -161,10 +151,10 @@ final class ProcessorTest extends TestCase
 
     public function testDoesNotPassOnItemIfDroppedByHandler(): void
     {
-        $dropHandler = $this->makeHandler(handleItemCallback: static function ($item, $response) {
+        $dropHandler = self::makeHandler(handleItemCallback: static function ($item, $response) {
             return $item->drop('::reason::');
         });
-        $handlerB = $this->makeHandler();
+        $handlerB = self::makeHandler();
         $item = new Item([]);
         $request = $this->makeRequest(callback: static fn () => yield ParseResult::fromValue($item));
         $stack = $this->processor->withMiddleware($dropHandler, $handlerB);
@@ -177,8 +167,8 @@ final class ProcessorTest extends TestCase
 
     public function testDispatchesEventIfResponseWasDropped(): void
     {
-        $dropHandler = $this->makeHandler(handleResponse: static fn ($response) => $response->drop('::reason::'));
-        $otherHandler = $this->makeHandler();
+        $dropHandler = self::makeHandler(handleResponse: static fn ($response) => $response->drop('::reason::'));
+        $otherHandler = self::makeHandler();
         $response = $this->makeResponse($this->makeRequest());
         $stack = $this->processor->withMiddleware($dropHandler, $otherHandler);
 
@@ -196,12 +186,10 @@ final class ProcessorTest extends TestCase
 
     public function testDispatchEventIfRequestWasDropped(): void
     {
-        $dropHandler = $this->makeHandler(handleRequestCallback: static function ($request, $response) {
+        $dropHandler = self::makeHandler(handleRequestCallback: static function ($request, $response) {
             return $request->drop('::reason::');
         });
-        $request = $this->makeRequest(
-            callback: fn () => yield ParseResult::fromValue($this->makeRequest()),
-        );
+        $request = $this->makeRequest(callback: fn () => yield ParseResult::fromValue($this->makeRequest()));
 
         $this->processor
             ->withMiddleware($dropHandler)
@@ -216,9 +204,7 @@ final class ProcessorTest extends TestCase
 
     public function testDontDispatchEventIfRequestWasNotDropped(): void
     {
-        $request = $this->makeRequest(
-            callback: fn () => yield ParseResult::fromValue($this->makeRequest()),
-        );
+        $request = $this->makeRequest(callback: fn () => yield ParseResult::fromValue($this->makeRequest()));
 
         $this->processor
             ->handle($this->makeResponse($request))
@@ -229,7 +215,7 @@ final class ProcessorTest extends TestCase
 
     public function testDispatchEventIfItemWasDropped(): void
     {
-        $dropHandler = $this->makeHandler(handleItemCallback: static function ($item) {
+        $dropHandler = self::makeHandler(handleItemCallback: static function ($item) {
             return $item->drop('::reason::');
         });
         $request = $this->makeRequest(callback: static fn () => yield ParseResult::item(['foo' => 'bar']));
@@ -256,7 +242,7 @@ final class ProcessorTest extends TestCase
         $this->dispatcher->assertNotDispatched(ItemDropped::NAME);
     }
 
-    private function makeHandler(
+    private static function makeHandler(
         ?\Closure $handleResponse = null,
         ?\Closure $handleItemCallback = null,
         ?\Closure $handleRequestCallback = null,

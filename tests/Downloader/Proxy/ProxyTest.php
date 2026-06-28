@@ -43,23 +43,11 @@ final class ProxyTest extends TestCase
                 ->allProtocols('::proxy-url-2::'),
         ]);
 
-        $options = $proxy->optionsFor(
-            $this->makeRequest('https://domain-1.com'),
-        );
-        self::assertTrue(
-            $options->equals(
-                ProxyOptions::make()->allProtocols('::proxy-url-1::'),
-            ),
-        );
+        $options = $proxy->optionsFor($this->makeRequest('https://domain-1.com'));
+        self::assertTrue($options->equals(ProxyOptions::make()->allProtocols('::proxy-url-1::')));
 
-        $options = $proxy->optionsFor(
-            $this->makeRequest('https://domain-2.com'),
-        );
-        self::assertTrue(
-            $options->equals(
-                ProxyOptions::make()->allProtocols('::proxy-url-2::'),
-            ),
-        );
+        $options = $proxy->optionsFor($this->makeRequest('https://domain-2.com'));
+        self::assertTrue($options->equals(ProxyOptions::make()->allProtocols('::proxy-url-2::')));
     }
 
     public function testReturnsWildcardOptionsIfConfiguredAndDomainDoesntMatch(): void
@@ -71,14 +59,8 @@ final class ProxyTest extends TestCase
                 ->allProtocols('::proxy-url-2::'),
         ]);
 
-        $options = $proxy->optionsFor(
-            $this->makeRequest('https://domain-2.com'),
-        );
-        self::assertTrue(
-            $options->equals(
-                ProxyOptions::make()->allProtocols('::proxy-url-2::'),
-            ),
-        );
+        $options = $proxy->optionsFor($this->makeRequest('https://domain-2.com'));
+        self::assertTrue($options->equals(ProxyOptions::make()->allProtocols('::proxy-url-2::')));
     }
 
     public function testPreferDomainConfigurationOverWildcard(): void
@@ -90,13 +72,7 @@ final class ProxyTest extends TestCase
                 ->allProtocols('::proxy-url-2::'),
         ]);
 
-        $options = $proxy->optionsFor(
-            $this->makeRequest('https://domain-1.com'),
-        );
-        self::assertTrue(
-            $options->equals(
-                ProxyOptions::make()->allProtocols('::proxy-url-1::'),
-            ),
-        );
+        $options = $proxy->optionsFor($this->makeRequest('https://domain-1.com'));
+        self::assertTrue($options->equals(ProxyOptions::make()->allProtocols('::proxy-url-1::')));
     }
 }

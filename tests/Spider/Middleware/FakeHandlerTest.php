@@ -90,9 +90,7 @@ final class FakeHandlerTest extends TestCase
 
     public function testCallsConfiguredRequestCallbackIfProvided(): void
     {
-        $handler = new FakeHandler(
-            handleRequestCallback: static fn ($request) => $request->withMeta('::key::', '::value::'),
-        );
+        $handler = new FakeHandler(handleRequestCallback: static fn ($request) => $request->withMeta('::key::', '::value::'));
         $request = $this->makeRequest();
         $response = $this->makeResponse($this->makeRequest());
 

@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace RoachPHP\Downloader\Middleware;
 
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Psr\Log\LoggerInterface;
+use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Support\Configurable;
 use Spatie\Browsershot\Browsershot;
 
-final class ExecuteJavascriptMiddleware implements ResponseMiddlewareInterface
+final class ExecuteJavascriptMiddleware implements RequestMiddlewareInterface
 {
     use Configurable;
 
@@ -34,14 +36,12 @@ final class ExecuteJavascriptMiddleware implements ResponseMiddlewareInterface
         private LoggerInterface $logger,
         ?callable $getBrowsershot = null,
     ) {
-        $this->getBrowsershot = $getBrowsershot ?? static fn (string $uri): Browsershot => Browsershot::url($uri)->waitUntilNetworkIdle();
+        $this->getBrowsershot = $getBrowsershot ?? static fn (string $uri): Browsershot => Browsershot::url($uri);
     }
 
-    public function handleResponse(Response $response): Response
+    public function handleRequest(Request $request): Request
     {
-        $browsershot = $this->configureBrowsershot(
-            $response->getRequest()->getUri(),
-        );
+        $browsershot = $this->configureBrowsershot($request->getUri());
 
         try {
             $body = $browsershot->bodyHtml();
@@ -51,10 +51,13 @@ final class ExecuteJavascriptMiddleware implements ResponseMiddlewareInterface
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return $response->drop('Error while executing javascript');
+            return $request->drop('Error while executing javascript');
         }
 
-        return $response->withBody($body);
+        return $request->withResponse(new Response(
+            new Psr7Response(200, [], $body),
+            $request,
+        ), );
     }
 
     /**
@@ -63,6 +66,13 @@ final class ExecuteJavascriptMiddleware implements ResponseMiddlewareInterface
     private function configureBrowsershot(string $uri): Browsershot
     {
         $browsershot = ($this->getBrowsershot)($uri);
+
+        /** @var null|bool $waitUntilNetworkIdle */
+        $waitUntilNetworkIdle = $this->option('waitUntilNetworkIdle');
+
+        if (null !== $waitUntilNetworkIdle) {
+            $browsershot->waitUntilNetworkIdle($waitUntilNetworkIdle);
+        }
 
         if (!empty($this->option('chromiumArguments'))) {
             /** @phpstan-ignore argument.type */
@@ -112,9 +122,10 @@ final class ExecuteJavascriptMiddleware implements ResponseMiddlewareInterface
         return $browsershot;
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
+            'waitUntilNetworkIdle' => true,
             'chromiumArguments' => [],
             'chromePath' => null,
             'binPath' => null,

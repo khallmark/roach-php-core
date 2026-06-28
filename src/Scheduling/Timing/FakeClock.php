@@ -31,9 +31,7 @@ final class FakeClock implements ClockInterface
 
     public function sleep(int $seconds): void
     {
-        $this->sleepUntil(
-            $this->now->add(new \DateInterval("PT{$seconds}S")),
-        );
+        $this->sleepUntil($this->now->add(new \DateInterval("PT{$seconds}S")));
     }
 
     public function sleepUntil(\DateTimeImmutable $date): void

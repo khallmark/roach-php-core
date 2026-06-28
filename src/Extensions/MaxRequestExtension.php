@@ -55,7 +55,7 @@ final class MaxRequestExtension implements ExtensionInterface
         }
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'limit' => 10,

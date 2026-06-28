@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\ItemPipeline;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Tests\Fixtures\TestItem;
 
@@ -66,9 +67,7 @@ final class AbstractItemTest extends TestCase
         self::assertSame('::new-value-2::', $item->bar);
     }
 
-    /**
-     * @dataProvider inaccessiblePropertiesProvider
-     */
+    #[DataProvider('inaccessiblePropertiesProvider')]
     public function testThrowsExceptionWhenTryingToSetNonPublicOrNonExistentProperty(string $property): void
     {
         $item = new TestItem(foo: '::old-value-1::', bar: '::old-value-2::');
@@ -78,9 +77,7 @@ final class AbstractItemTest extends TestCase
         $item->set($property, '::new-value::');
     }
 
-    /**
-     * @dataProvider hasPropertyProvider
-     */
+    #[DataProvider('hasPropertyProvider')]
     public function testHasProperty(string $property, bool $expected): void
     {
         $item = new TestItem(foo: '::value-1::', bar: '::value-2::');
@@ -88,9 +85,7 @@ final class AbstractItemTest extends TestCase
         self::assertSame($expected, $item->has($property));
     }
 
-    /**
-     * @dataProvider hasPropertyProvider
-     */
+    #[DataProvider('hasPropertyProvider')]
     public function testOffsetExists(string $property, bool $expected): void
     {
         $item = new TestItem(foo: '::value-1::', bar: '::value-2::');
@@ -153,9 +148,7 @@ final class AbstractItemTest extends TestCase
         self::assertSame('::new-value-2::', $item->bar);
     }
 
-    /**
-     * @dataProvider inaccessiblePropertiesProvider
-     */
+    #[DataProvider('inaccessiblePropertiesProvider')]
     public function testOffsetSetThrowsExceptionWhenSettingInaccessibleOrNonExistentProperty(string $property): void
     {
         $item = new TestItem(foo: '::value-1::', bar: '::value-2::');

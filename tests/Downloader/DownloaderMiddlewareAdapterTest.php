@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Downloader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Downloader\DownloaderMiddlewareInterface;
 use RoachPHP\Downloader\Middleware\DownloaderMiddlewareAdapter;
@@ -52,9 +53,7 @@ final class DownloaderMiddlewareAdapterTest extends TestCase
         self::assertSame($middleware, $class);
     }
 
-    /**
-     * @dataProvider requestMiddlewareProvider
-     */
+    #[DataProvider('requestMiddlewareProvider')]
     public function testRequestMiddlewareImplementation(callable $testCase): void
     {
         $middleware = new class() implements RequestMiddlewareInterface {
@@ -89,9 +88,7 @@ final class DownloaderMiddlewareAdapterTest extends TestCase
         }];
     }
 
-    /**
-     * @dataProvider responseMiddlewareProvider
-     */
+    #[DataProvider('responseMiddlewareProvider')]
     public function testResponseMiddlewareImplementation(callable $testCase): void
     {
         $middleware = new class() implements ResponseMiddlewareInterface {

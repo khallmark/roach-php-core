@@ -71,13 +71,11 @@ final class RequestDeduplicationMiddlewareTest extends TestCase
         $this->middleware->handleRequest($request);
         $this->middleware->handleRequest($request);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged(
-                'info',
-                '[RequestDeduplicationMiddleware] Dropping duplicate request',
-                ['uri' => 'https://example.com'],
-            ),
-        );
+        self::assertTrue($this->logger->messageWasLogged(
+            'info',
+            '[RequestDeduplicationMiddleware] Dropping duplicate request',
+            ['uri' => 'https://example.com'],
+        ), );
     }
 
     public function testIgnoresTrailingSlashesByDefaultWhenComparingUrls(): void

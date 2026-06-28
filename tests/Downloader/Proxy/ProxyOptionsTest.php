@@ -171,9 +171,9 @@ final class ProxyOptionsTest extends TestCase
         self::assertEquals($expected, $options->isEmpty());
     }
 
-    public static function emptyProxyProvider(): array
+    public static function emptyProxyProvider(): iterable
     {
-        return [
+        yield from [
             'only http' => [
                 new ProxyOptions('::http-proxy-url::'),
                 false,

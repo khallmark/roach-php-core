@@ -47,27 +47,35 @@ final class Engine implements EngineInterface
         $extension = new ScrapedItemCollectorExtension();
         $this->eventDispatcher->addSubscriber($extension);
 
-        $this->start($run);
+        try {
+            $this->start($run);
 
-        return $extension->getScrapedItems();
+            return $extension->getScrapedItems();
+        } finally {
+            $this->eventDispatcher->removeSubscriber($extension);
+        }
     }
 
     public function start(Run $run): void
     {
-        $this->configure($run);
+        try {
+            $this->configure($run);
 
-        $this->eventDispatcher->dispatch(
-            new RunStarting($run),
-            RunStarting::NAME,
-        );
+            $this->eventDispatcher->dispatch(
+                new RunStarting($run),
+                RunStarting::NAME,
+            );
 
-        if ($this->scheduler->empty()) {
-            foreach ($run->startRequests as $request) {
-                $this->scheduleRequest($request);
+            if ($this->scheduler->empty()) {
+                foreach ($run->startRequests as $request) {
+                    $this->scheduleRequest($request);
+                }
             }
-        }
 
-        $this->work($run);
+            $this->work($run);
+        } finally {
+            $this->cleanup($run);
+        }
     }
 
     private function work(Run $run): void
@@ -100,9 +108,7 @@ final class Engine implements EngineInterface
                 $scheduledRequests = $this->downloader->scheduledRequests();
             }
 
-            $this->downloader->flush(
-                fn (Response $response) => $this->onFulfilled($response),
-            );
+            $this->downloader->flush(fn (Response $response) => $this->onFulfilled($response));
         }
 
         $this->eventDispatcher->dispatch(
@@ -154,6 +160,13 @@ final class Engine implements EngineInterface
 
         foreach ($run->extensions as $extension) {
             $this->eventDispatcher->addSubscriber($extension);
+        }
+    }
+
+    private function cleanup(Run $run): void
+    {
+        foreach ($run->extensions as $extension) {
+            $this->eventDispatcher->removeSubscriber($extension);
         }
     }
 }

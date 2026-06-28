@@ -51,7 +51,7 @@ final class HttpErrorMiddleware implements ResponseMiddlewareInterface
         return $response->drop('Unallowed HTTP status: ' . $status);
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'handleStatus' => [],

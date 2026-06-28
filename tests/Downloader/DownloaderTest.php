@@ -307,13 +307,11 @@ final class DownloaderTest extends TestCase
     public function testDispatchEventWhenResponseWasProcessedByMiddleware(): void
     {
         $request = $this->makeRequest();
-        $middleware = new FakeMiddleware(
-            responseHandler: function (Response $response) {
-                $this->dispatcher->assertNotDispatched(ResponseReceived::NAME);
+        $middleware = new FakeMiddleware(responseHandler: function (Response $response) {
+            $this->dispatcher->assertNotDispatched(ResponseReceived::NAME);
 
-                return $response;
-            },
-        );
+            return $response;
+        }, );
         $this->downloader->withMiddleware($middleware);
 
         $this->downloader->prepare($request);

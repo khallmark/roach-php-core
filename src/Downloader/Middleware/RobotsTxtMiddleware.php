@@ -62,7 +62,7 @@ final class RobotsTxtMiddleware implements RequestMiddlewareInterface
         return "{$robotsUrl}/{$fileName}";
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'fileName' => 'robots.txt',

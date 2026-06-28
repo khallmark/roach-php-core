@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Scheduling;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Scheduling\ArrayRequestScheduler;
 use RoachPHP\Scheduling\Timing\FakeClock;
@@ -46,9 +47,7 @@ final class ArrayRequestSchedulerTest extends TestCase
         self::assertFalse($this->scheduler->empty());
     }
 
-    /**
-     * @dataProvider batchSizeProvider
-     */
+    #[DataProvider('batchSizeProvider')]
     public function testGroupScheduledRequestAccordingToBatchSize(int $batchSize, array $expectedBatchSizes): void
     {
         for ($i = 0; 10 > $i; ++$i) {
@@ -64,27 +63,27 @@ final class ArrayRequestSchedulerTest extends TestCase
     {
         yield 'batch size 1' => [
             'batchSize' => 1,
-            'expectedRequestCounts' => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            'expectedBatchSizes' => [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
         ];
 
         yield 'batch size 2' => [
             'batchSize' => 2,
-            'expectedRequestCounts' => [2, 2, 2, 2, 2, 0],
+            'expectedBatchSizes' => [2, 2, 2, 2, 2, 0],
         ];
 
         yield 'batch size 3' => [
             'batchSize' => 3,
-            'expectedRequestCounts' => [3, 3, 3, 1, 0],
+            'expectedBatchSizes' => [3, 3, 3, 1, 0],
         ];
 
         yield 'batch size 4' => [
             'batchSize' => 4,
-            'expectedRequestCounts' => [4, 4, 2, 0],
+            'expectedBatchSizes' => [4, 4, 2, 0],
         ];
 
         yield 'batch size 5' => [
             'batchSize' => 5,
-            'expectedRequestCounts' => [5, 5, 0],
+            'expectedBatchSizes' => [5, 5, 0],
         ];
     }
 

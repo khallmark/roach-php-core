@@ -9,8 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: ['8.2', '8.3', '8.4']
-        dependency-version: [prefer-lowest, prefer-stable]
+        php: ['8.4', '8.5']
+        dependency-version: [prefer-stable]
 
     name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
@@ -50,6 +50,9 @@ jobs:
 
       - name: Run phpstan
         run: composer analyze
+
+      - name: Check coding standards
+        run: composer coding-standards-check
 
       - name: Start server
         run: (php -S localhost:8000 -t ./tests/Server &) || /bin/true

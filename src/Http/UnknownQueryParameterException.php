@@ -17,8 +17,6 @@ final class UnknownQueryParameterException extends \Exception
 {
     public static function forParameter(string $parameter): self
     {
-        return new self(
-            "Trying to retrieve unknown parameter [{$parameter}] from query string",
-        );
+        return new self("Trying to retrieve unknown parameter [{$parameter}] from query string");
     }
 }

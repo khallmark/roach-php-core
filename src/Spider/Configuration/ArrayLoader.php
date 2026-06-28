@@ -24,11 +24,11 @@ final class ArrayLoader implements ConfigurationLoaderStrategy
 {
     /**
      * @var array{
-     *   startUrls: string[],
-     *   downloaderMiddleware: class-string<DownloaderMiddlewareInterface>[],
-     *   spiderMiddleware: class-string<SpiderMiddlewareInterface>[],
-     *   itemProcessors: class-string<ItemProcessorInterface>[],
-     *   extensions: class-string<ExtensionInterface>[],
+     *   startUrls: list<string>,
+     *   downloaderMiddleware: list<class-string<DownloaderMiddlewareInterface>>,
+     *   spiderMiddleware: list<class-string<SpiderMiddlewareInterface>>,
+     *   itemProcessors: list<class-string<ItemProcessorInterface>>,
+     *   extensions: list<class-string<ExtensionInterface>>,
      *   concurrency: int,
      *   requestDelay: int
      * }

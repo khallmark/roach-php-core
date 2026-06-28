@@ -26,7 +26,7 @@ final class UserAgentMiddleware implements RequestMiddlewareInterface
         return $request->addHeader('User-Agent', $this->option('userAgent'));
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'userAgent' => 'roach-php',

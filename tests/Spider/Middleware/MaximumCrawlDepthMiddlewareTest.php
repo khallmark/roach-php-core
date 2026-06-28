@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Spider\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Spider\Middleware\MaximumCrawlDepthMiddleware;
 use RoachPHP\Testing\Concerns\InteractsWithRequestsAndResponses;
@@ -24,16 +25,13 @@ final class MaximumCrawlDepthMiddlewareTest extends TestCase
 {
     use InteractsWithRequestsAndResponses;
 
-    /**
-     * @dataProvider initialDepthProvider
-     */
+    #[DataProvider('initialDepthProvider')]
     public function testIncrementsCrawlDepthForOutgoingRequestsBasedOnResponseCrawlDepth(int $initialDepth): void
     {
         $previousRequest = $this->makeRequest()->withMeta('depth', $initialDepth);
         $response = $this->makeResponse($previousRequest);
 
-        $processedRequest = $this
-            ->createMiddleware()
+        $processedRequest = self::createMiddleware()
             ->handleRequest($this->makeRequest(), $response);
 
         self::assertSame($initialDepth + 1, $processedRequest->getMeta('depth'));
@@ -56,16 +54,13 @@ final class MaximumCrawlDepthMiddlewareTest extends TestCase
 
     public function testHandleMissingDepthOnResponse(): void
     {
-        $processedRequest = $this
-            ->createMiddleware()
+        $processedRequest = self::createMiddleware()
             ->handleRequest($this->makeRequest(), $this->makeResponse());
 
         self::assertSame(2, $processedRequest->getMeta('depth'));
     }
 
-    /**
-     * @dataProvider maxCrawlDepthProvider
-     */
+    #[DataProvider('maxCrawlDepthProvider')]
     public function testDropRequestsAboveTheMaximumCrawlDepth(int $maxCrawlDepth): void
     {
         $previousRequest = $this
@@ -74,16 +69,13 @@ final class MaximumCrawlDepthMiddlewareTest extends TestCase
             ->withMeta('depth', $maxCrawlDepth);
         $response = $this->makeResponse($previousRequest);
 
-        $processedRequest = $this
-            ->createMiddleware($maxCrawlDepth)
+        $processedRequest = self::createMiddleware($maxCrawlDepth)
             ->handleRequest($this->makeRequest(), $response);
 
         self::assertTrue($processedRequest->wasDropped());
     }
 
-    /**
-     * @dataProvider maxCrawlDepthProvider
-     */
+    #[DataProvider('maxCrawlDepthProvider')]
     public function testAllowRequestsBelowTheMaximumCrawlDepth(int $maxCrawlDepth): void
     {
         $previousRequest = $this
@@ -93,8 +85,7 @@ final class MaximumCrawlDepthMiddlewareTest extends TestCase
 
         $response = $this->makeResponse($previousRequest);
 
-        $processedRequest = $this
-            ->createMiddleware($maxCrawlDepth)
+        $processedRequest = self::createMiddleware($maxCrawlDepth)
             ->handleRequest($this->makeRequest(), $response);
 
         self::assertFalse($processedRequest->wasDropped());
@@ -113,7 +104,7 @@ final class MaximumCrawlDepthMiddlewareTest extends TestCase
         ];
     }
 
-    private function createMiddleware(?int $maxCrawlDepth = null): MaximumCrawlDepthMiddleware
+    private static function createMiddleware(?int $maxCrawlDepth = null): MaximumCrawlDepthMiddleware
     {
         $middleware = new MaximumCrawlDepthMiddleware();
 

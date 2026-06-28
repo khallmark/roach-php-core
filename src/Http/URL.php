@@ -33,7 +33,7 @@ final class URL
     public static function parse(string $url): self
     {
         /**
-         * @var false|array{
+         * @var array{
          *     host?: string,
          *     user?: string,
          *     pass?: string,
@@ -42,7 +42,7 @@ final class URL
          *     path?: string,
          *     query?: string,
          *     fragment?: string,
-         * } $parts
+         * }|false $parts
          */
         $parts = \parse_url($url);
 

@@ -26,7 +26,7 @@ final class ItemProcessor implements ItemProcessorInterface
         return $item;
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             '::option-key::' => '::default-option-value::',

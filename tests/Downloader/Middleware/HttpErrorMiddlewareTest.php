@@ -36,7 +36,19 @@ final class HttpErrorMiddlewareTest extends TestCase
         $this->middleware = new HttpErrorMiddleware($this->logger);
     }
 
-    public static function successfulHTTPStatus(): \Generator
+    #[DataProvider('successfulHTTPStatus')]
+    public function testAllowResponseWithSuccessfulHTTPStatus(int $status): void
+    {
+        $response = $this->makeResponse(status: $status);
+        $this->middleware->configure([]);
+
+        $result = $this->middleware->handleResponse($response);
+
+        self::assertSame($result, $response);
+        self::assertFalse($result->wasDropped());
+    }
+
+    public static function successfulHTTPStatus(): iterable
     {
         yield from [
             [200],
@@ -51,7 +63,19 @@ final class HttpErrorMiddlewareTest extends TestCase
         ];
     }
 
-    public static function unsuccessfulHTTPStatus(): \Generator
+    #[DataProvider('unsuccessfulHTTPStatus')]
+    public function testDropResponseWithNonSuccessfulHTTPStatus(int $status): void
+    {
+        $response = $this->makeResponse(status: $status);
+        $this->middleware->configure([]);
+
+        $result = $this->middleware->handleResponse($response);
+
+        self::assertNotSame($result, $response);
+        self::assertTrue($result->wasDropped());
+    }
+
+    public static function unsuccessfulHTTPStatus(): iterable
     {
         yield from [
             [100],
@@ -110,30 +134,6 @@ final class HttpErrorMiddlewareTest extends TestCase
         ];
     }
 
-    #[DataProvider('successfulHTTPStatus')]
-    public function testAllowResponseWithSuccessfulHTTPStatus(int $status): void
-    {
-        $response = $this->makeResponse(status: $status);
-        $this->middleware->configure([]);
-
-        $result = $this->middleware->handleResponse($response);
-
-        self::assertSame($result, $response);
-        self::assertFalse($result->wasDropped());
-    }
-
-    #[DataProvider('unsuccessfulHTTPStatus')]
-    public function testDropResponseWithNonSuccessfulHTTPStatus(int $status): void
-    {
-        $response = $this->makeResponse(status: $status);
-        $this->middleware->configure([]);
-
-        $result = $this->middleware->handleResponse($response);
-
-        self::assertNotSame($result, $response);
-        self::assertTrue($result->wasDropped());
-    }
-
     public function testLogDroppedResponses(): void
     {
         $request = $this->makeRequest('https://example.com');
@@ -142,13 +142,11 @@ final class HttpErrorMiddlewareTest extends TestCase
 
         $this->middleware->handleResponse($response);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged(
-                'info',
-                '[HttpErrorMiddleware] Dropping unsuccessful response',
-                ['uri' => 'https://example.com', 'status' => 400],
-            ),
-        );
+        self::assertTrue($this->logger->messageWasLogged(
+            'info',
+            '[HttpErrorMiddleware] Dropping unsuccessful response',
+            ['uri' => 'https://example.com', 'status' => 400],
+        ), );
     }
 
     public function testDontLogAllowedResponses(): void
@@ -158,12 +156,10 @@ final class HttpErrorMiddlewareTest extends TestCase
 
         $this->middleware->handleResponse($response);
 
-        self::assertFalse(
-            $this->logger->messageWasLogged(
-                'info',
-                '[AllowedHttpStatusMiddleware] Dropping response with unallowed HTTP status',
-            ),
-        );
+        self::assertFalse($this->logger->messageWasLogged(
+            'info',
+            '[AllowedHttpStatusMiddleware] Dropping response with unallowed HTTP status',
+        ), );
     }
 
     public function testAllowResponsesWithCustomAllowedStatuses(): void

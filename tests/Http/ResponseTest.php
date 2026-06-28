@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace RoachPHP\Tests\Http;
 
 use GuzzleHttp\Psr7\Stream;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Http\Response;
 use RoachPHP\Support\DroppableInterface;
@@ -37,9 +38,7 @@ final class ResponseTest extends TestCase
         self::assertCount(1, $links);
     }
 
-    /**
-     * @dataProvider responseCodeProvider
-     */
+    #[DataProvider('responseCodeProvider')]
     public function testCanRetrieveStatusCodeOfOriginalResponse(int $statusCode): void
     {
         $response = new Response(new \GuzzleHttp\Psr7\Response($statusCode), $this->makeRequest());
@@ -60,9 +59,7 @@ final class ResponseTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider responseBodyProvider
-     */
+    #[DataProvider('responseBodyProvider')]
     public function testCanRetrieveHtmlBodyOfOriginalResponse(callable $getBody): void
     {
         $body = '<html lang="en"><body><p>Hello, world!</p></body>';
@@ -86,7 +83,6 @@ final class ResponseTest extends TestCase
 
                 return $stream;
             }],
-
             'StreamInterface' => [static function (string $body) {
                 $stream = \fopen('php://memory', 'r+b');
                 \fwrite($stream, $body);
@@ -127,8 +123,6 @@ final class ResponseTest extends TestCase
 
     protected function createDroppable(): DroppableInterface
     {
-        return $this->makeResponse(
-            $this->makeRequest(),
-        );
+        return $this->makeResponse($this->makeRequest());
     }
 }

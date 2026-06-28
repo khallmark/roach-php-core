@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Shell\Resolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Shell\Resolver\FakeNamespaceResolver;
 use RoachPHP\Tests\Fixtures\RequestSpiderMiddleware;
@@ -23,9 +24,7 @@ use RoachPHP\Tests\Fixtures\TestSpider;
  */
 final class FakeNamespaceResolverTest extends TestCase
 {
-    /**
-     * @dataProvider inputStringProvider
-     */
+    #[DataProvider('inputStringProvider')]
     public function testAlwaysReturnsTheOriginalString(string $input): void
     {
         $result = (new FakeNamespaceResolver())->resolveSpiderNamespace($input);

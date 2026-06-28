@@ -27,7 +27,7 @@ final class RequestSpiderMiddleware implements RequestMiddlewareInterface
         return $request;
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             '::option-key::' => '::default-option-value::',

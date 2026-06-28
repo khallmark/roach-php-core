@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Shell\Resolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Shell\Resolver\DefaultNamespaceResolverDecorator;
 use RoachPHP\Shell\Resolver\FakeNamespaceResolver;
@@ -25,17 +26,15 @@ final class DefaultNamespaceResolverDecoratorTest extends TestCase
 {
     public function testPassInputThroughUnchangedIfItAlreadyPointsToExistingClass(): void
     {
-        $result = $this->getResolver('::different-default-namespace::')->resolveSpiderNamespace(TestSpider::class);
+        $result = self::getResolver('::different-default-namespace::')->resolveSpiderNamespace(TestSpider::class);
 
         self::assertSame(TestSpider::class, $result);
     }
 
-    /**
-     * @dataProvider prependNamespaceProvider
-     */
+    #[DataProvider('prependNamespaceProvider')]
     public function testPrependsDefaultNamespaceIfPassedClassDoesNotExist(string $spiderName): void
     {
-        $result = $this->getResolver()->resolveSpiderNamespace($spiderName);
+        $result = self::getResolver()->resolveSpiderNamespace($spiderName);
 
         self::assertSame('RoachPHP\Tests\Fixtures\\' . $spiderName, $result);
     }
@@ -49,19 +48,16 @@ final class DefaultNamespaceResolverDecoratorTest extends TestCase
             'only class name' => [
                 'TestSpider',
             ],
-
             'relative namespace' => [
                 'Derp\TestSpider',
             ],
         ];
     }
 
-    /**
-     * @dataProvider defaultNamespaceProvider
-     */
+    #[DataProvider('defaultNamespaceProvider')]
     public function testNormalizesDefaultNamespace(string $nonNormalizedNamespace): void
     {
-        $result = $this->getResolver($nonNormalizedNamespace)->resolveSpiderNamespace('TestSpider');
+        $result = self::getResolver($nonNormalizedNamespace)->resolveSpiderNamespace('TestSpider');
 
         self::assertSame('RoachPHP\Tests\Fixtures\TestSpider', $result);
     }
@@ -75,27 +71,22 @@ final class DefaultNamespaceResolverDecoratorTest extends TestCase
             'leading backslashes' => [
                 '\RoachPHP\Tests\Fixtures',
             ],
-
             'trailing backslashes' => [
                 'RoachPHP\Tests\Fixtures\\',
             ],
-
             'trailing spaces' => [
                 'RoachPHP\Tests\Fixtures ',
             ],
-
             'leading spaces' => [
                 ' RoachPHP\Tests\Fixtures',
             ],
         ];
     }
 
-    /**
-     * @dataProvider spiderNameProvider
-     */
+    #[DataProvider('spiderNameProvider')]
     public function testNormalizesProvidedSpiderName(string $nonNormalizedSpiderName): void
     {
-        $result = $this->getResolver()->resolveSpiderNamespace($nonNormalizedSpiderName);
+        $result = self::getResolver()->resolveSpiderNamespace($nonNormalizedSpiderName);
 
         self::assertSame('RoachPHP\Tests\Fixtures\TestSpider', $result);
     }
@@ -109,7 +100,6 @@ final class DefaultNamespaceResolverDecoratorTest extends TestCase
             'leading spaces' => [
                 ' TestSpider',
             ],
-
             'trailing spaces' => [
                 'TestSpider ',
             ],
@@ -118,19 +108,19 @@ final class DefaultNamespaceResolverDecoratorTest extends TestCase
 
     public function testTreatsLeadingBackslashesAsAbsolutePathAndReturnsItAsIs(): void
     {
-        $result = $this->getResolver()->resolveSpiderNamespace('\Test\Spider');
+        $result = self::getResolver()->resolveSpiderNamespace('\Test\Spider');
 
         self::assertSame('\Test\Spider', $result);
     }
 
     public function testDoesNotPrependDefaultNamespaceIfInputAlreadyStartsWithIt(): void
     {
-        $result = $this->getResolver('::default-namespace::')->resolveSpiderNamespace('::default-namespace::\Spider');
+        $result = self::getResolver('::default-namespace::')->resolveSpiderNamespace('::default-namespace::\Spider');
 
         self::assertSame('::default-namespace::\Spider', $result);
     }
 
-    private function getResolver(string $defaultNamespace = 'RoachPHP\Tests\Fixtures'): DefaultNamespaceResolverDecorator
+    private static function getResolver(string $defaultNamespace = 'RoachPHP\Tests\Fixtures'): DefaultNamespaceResolverDecorator
     {
         return new DefaultNamespaceResolverDecorator(
             new FakeNamespaceResolver(),
