@@ -32,16 +32,22 @@ final class BrandingTest extends TestCase
 
         $authors = \array_column($composer['authors'], 'name');
         self::assertContains('Kai Sassnowski', $authors);
-        self::assertNotContains('Neuro' . 'typic AI', $authors);
+        self::assertNotContains(\sprintf('%s%s AI', 'Neuro', 'typic'), $authors);
 
         self::assertStringContainsString('Roach is a complete web scraping toolkit for PHP.', $readme);
         self::assertStringContainsString('composer require roach-php/core', $readme);
 
+        $formerBrandingTerms = [
+            \sprintf('%s%s', 'Palm', 'etto'),
+            \sprintf('%s%s', 'palm', 'etto'),
+            \sprintf('%s%s', 'Neuro', 'typic'),
+            \sprintf('%s%s', 'neuro', 'typic'),
+        ];
+
         foreach ([$composerJson, $readme] as $publicBranding) {
-            self::assertStringNotContainsString('Palm' . 'etto', $publicBranding);
-            self::assertStringNotContainsString('palm' . 'etto', $publicBranding);
-            self::assertStringNotContainsString('Neuro' . 'typic', $publicBranding);
-            self::assertStringNotContainsString('neuro' . 'typic', $publicBranding);
+            foreach ($formerBrandingTerms as $formerBrandingTerm) {
+                self::assertStringNotContainsString($formerBrandingTerm, $publicBranding);
+            }
         }
     }
 
