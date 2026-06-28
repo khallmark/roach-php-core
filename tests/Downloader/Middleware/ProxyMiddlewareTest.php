@@ -114,9 +114,9 @@ final class ProxyMiddlewareTest extends TestCase
         );
     }
 
-    public static function requestURLProvider(): array
+    public static function requestURLProvider(): iterable
     {
-        return [
+        yield from [
             ['https://example.com'],
             ['https://lorem-ipsum.com'],
             ['https://google.com'],
@@ -168,17 +168,15 @@ final class ProxyMiddlewareTest extends TestCase
 
         $this->middleware->handleRequest($request);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged(
-                'info',
-                '[ProxyMiddleware] Using proxy for request',
-                [
-                    'http' => '::http-proxy::',
-                    'https' => '::https-proxy::',
-                    'no' => ['::no::'],
-                ],
-            ),
-        );
+        self::assertTrue($this->logger->messageWasLogged(
+            'info',
+            '[ProxyMiddleware] Using proxy for request',
+            [
+                'http' => '::http-proxy::',
+                'https' => '::https-proxy::',
+                'no' => ['::no::'],
+            ],
+        ), );
     }
 
     public function testUseCustomConfigurationLoaderClassIfProvided(): void
@@ -207,12 +205,10 @@ final class ProxyMiddlewareTest extends TestCase
         $this->middleware->handleRequest($request);
 
         self::assertArrayNotHasKey('proxy', $request->getOptions());
-        self::assertTrue(
-            $this->logger->messageWasLogged(
-                'warning',
-                '[ProxyMiddleware] No proxy configured for middleware',
-            ),
-        );
+        self::assertTrue($this->logger->messageWasLogged(
+            'warning',
+            '[ProxyMiddleware] No proxy configured for middleware',
+        ), );
     }
 }
 

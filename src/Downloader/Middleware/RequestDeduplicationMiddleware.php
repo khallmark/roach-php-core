@@ -48,8 +48,7 @@ final class RequestDeduplicationMiddleware implements RequestMiddlewareInterface
             $replaceFlags |= \HTTP_URL_STRIP_QUERY;
         }
 
-        /** @phpstan-ignore argument.type */
-        $uri = http_build_url($uri, $parts, $replaceFlags);
+        $uri = http_build_url($uri, false === $parts ? [] : $parts, $replaceFlags);
 
         if (\in_array($uri, $this->seenUris, true)) {
             $this->logger->info(
@@ -65,7 +64,7 @@ final class RequestDeduplicationMiddleware implements RequestMiddlewareInterface
         return $request;
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'ignore_url_fragments' => false,

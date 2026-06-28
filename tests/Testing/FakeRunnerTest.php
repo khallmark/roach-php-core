@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace RoachPHP\Tests\Testing;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Core\FakeRunner;
 use RoachPHP\Spider\Configuration\Overrides;
@@ -32,9 +33,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner = new FakeRunner();
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasStartedPassesIfAnyRunForTheGivenSpiderClassWasStarted(string $method): void
     {
         $this->runner->{$method}(TestSpider::class);
@@ -49,9 +48,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner->assertRunWasStarted(TestSpider::class);
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasStartedFailsIfNoRunWasStartedForTheGivenSpider(string $method): void
     {
         $this->runner->{$method}(TestSpider2::class);
@@ -60,9 +57,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner->assertRunWasStarted(TestSpider::class);
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasStartedPassesIfTheProvidedClosureReturnsTrue(string $method): void
     {
         $this->runner->{$method}(TestSpider::class);
@@ -70,9 +65,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner->assertRunWasStarted(TestSpider::class, static fn () => true);
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasStartedPassesIfCallbackReturnsTrueForAnyOfTheFoundRuns(string $method): void
     {
         $this->runner->{$method}(TestSpider::class, context: ['foo' => 'bar']);
@@ -85,9 +78,7 @@ final class FakeRunnerTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasStartedFailsIfTheProvidedClosureReturnsFalse(string $method): void
     {
         $this->runner->{$method}(TestSpider::class);
@@ -96,9 +87,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner->assertRunWasStarted(TestSpider::class, static fn () => false);
     }
 
-    /**
-     * @dataProvider  runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasNotStartedPassesIfNoRunForTheGivenSpiderClassWasStarted(string $method): void
     {
         $this->runner->{$method}(TestSpider2::class);
@@ -111,9 +100,7 @@ final class FakeRunnerTest extends TestCase
         $this->runner->assertRunWasNotStarted(TestSpider::class);
     }
 
-    /**
-     * @dataProvider runnerMethodProvider
-     */
+    #[DataProvider('runnerMethodProvider')]
     public function testAssertRunWasNotStartedFailsIfRunForSpiderWasStarted(string $method): void
     {
         $this->runner->{$method}(TestSpider::class);

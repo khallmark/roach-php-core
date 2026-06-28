@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Extensions;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use RoachPHP\Core\Run;
 use RoachPHP\Events\ItemDropped;
 use RoachPHP\Events\ItemScraped;
@@ -40,10 +41,9 @@ final class StatsCollectorExtensionTest extends ExtensionTestCase
     private FakeClock $clock;
 
     /**
-     * @dataProvider statsScenarioProvider
-     *
      * @param array{event: Event, eventName: string, stat: string} $scenario
      */
+    #[DataProvider('statsScenarioProvider')]
     public function testCountNumberOfEventOccurrence(array $scenario, int $eventCount): void
     {
         $this->extension->configure([]);
@@ -65,19 +65,16 @@ final class StatsCollectorExtensionTest extends ExtensionTestCase
                 'eventName' => ItemScraped::NAME,
                 'stat' => 'items.scraped',
             ],
-
             'items.dropped' => [
                 'event' => new ItemDropped(new Item([])),
                 'eventName' => ItemDropped::NAME,
                 'stat' => 'items.dropped',
             ],
-
             'requests.sent' => [
                 'event' => new RequestSending(self::makeRequest()),
                 'eventName' => RequestSending::NAME,
                 'stat' => 'requests.sent',
             ],
-
             'requests.dropped' => [
                 'event' => new RequestDropped(self::makeRequest()),
                 'eventName' => RequestDropped::NAME,
@@ -92,9 +89,7 @@ final class StatsCollectorExtensionTest extends ExtensionTestCase
         }
     }
 
-    /**
-     * @dataProvider runtimeProvider
-     */
+    #[DataProvider('runtimeProvider')]
     public function testLogRuntime(int $seconds, string $expected): void
     {
         $this->extension->configure([]);
@@ -148,12 +143,10 @@ final class StatsCollectorExtensionTest extends ExtensionTestCase
             'items.dropped' => 0,
         ];
 
-        self::assertTrue(
-            $this->logger->messageWasLogged(
-                'info',
-                'Run statistics',
-                \array_merge($defaults, [$stat => $expectedValue]),
-            ),
-        );
+        self::assertTrue($this->logger->messageWasLogged(
+            'info',
+            'Run statistics',
+            \array_merge($defaults, [$stat => $expectedValue]),
+        ), );
     }
 }

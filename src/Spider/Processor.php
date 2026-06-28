@@ -59,13 +59,14 @@ final class Processor
 
         foreach ($results as $result) {
             $value = $result->value();
-            $handleMethod = $value instanceof Request
-                ? 'handleRequest'
-                : 'handleItem';
 
             foreach ($this->middleware as $handler) {
-                /** @var ItemInterface|Request $value */
-                $value = $handler->{$handleMethod}($value, $response);
+                if ($value instanceof Request) {
+                    $value = $handler->handleRequest($value, $response);
+                } else {
+                    /** @var ItemInterface $value */
+                    $value = $handler->handleItem($value, $response);
+                }
 
                 if ($value->wasDropped()) {
                     if ($value instanceof Request) {

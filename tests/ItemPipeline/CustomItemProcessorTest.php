@@ -26,26 +26,18 @@ final class CustomItemProcessorTest extends TestCase
     public function testHandlesItemsDefinedByTheChildClass(): void
     {
         $processor = new TestCustomItemProcessor([TestItem::class]);
-        self::assertTrue(
-            $processor->shouldHandle(new TestItem('::foo::', '::bar::')),
-        );
+        self::assertTrue($processor->shouldHandle(new TestItem('::foo::', '::bar::')));
 
         $processor = new TestCustomItemProcessor([TestItem2::class]);
-        self::assertTrue(
-            $processor->shouldHandle(new TestItem2()),
-        );
+        self::assertTrue($processor->shouldHandle(new TestItem2()));
     }
 
     public function testDoesNotHandleItemsNotDefinedInTheChildClass(): void
     {
         $processor = new TestCustomItemProcessor([TestItem::class]);
-        self::assertFalse(
-            $processor->shouldHandle(new TestItem2()),
-        );
+        self::assertFalse($processor->shouldHandle(new TestItem2()));
 
         $processor = new TestCustomItemProcessor([TestItem2::class]);
-        self::assertFalse(
-            $processor->shouldHandle(new TestItem('::foo::', '::bar::')),
-        );
+        self::assertFalse($processor->shouldHandle(new TestItem('::foo::', '::bar::')));
     }
 }

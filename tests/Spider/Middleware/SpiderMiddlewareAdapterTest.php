@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Spider\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
@@ -60,9 +61,7 @@ final class SpiderMiddlewareAdapterTest extends TestCase
         self::assertSame($middleware, $class);
     }
 
-    /**
-     * @dataProvider itemMiddlewareProvider
-     */
+    #[DataProvider('itemMiddlewareProvider')]
     public function testItemMiddlewareImplementation(callable $testCase): void
     {
         $middleware = new class() implements ItemMiddlewareInterface {
@@ -110,9 +109,7 @@ final class SpiderMiddlewareAdapterTest extends TestCase
         }];
     }
 
-    /**
-     * @dataProvider requestMiddlewareProvider
-     */
+    #[DataProvider('requestMiddlewareProvider')]
     public function testRequestMiddlewareImplementation(callable $testCase): void
     {
         $middleware = new class() implements RequestMiddlewareInterface {
@@ -160,9 +157,7 @@ final class SpiderMiddlewareAdapterTest extends TestCase
         }];
     }
 
-    /**
-     * @dataProvider responseMiddlewareProvider
-     */
+    #[DataProvider('responseMiddlewareProvider')]
     public function testResponseMiddlewareImplementation(callable $testCase): void
     {
         $middleware = new class() implements ResponseMiddlewareInterface {

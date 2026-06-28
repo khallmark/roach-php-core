@@ -41,7 +41,7 @@ final class RequestTest extends TestCase
 
     public function testCanAccessTheRequestUriPath(): void
     {
-        $request = $this->makeRequest('https://::request-uri::/::path::');
+        $request = $this->makeRequest('https://example.com/::path::');
 
         self::assertSame('/::path::', $request->getPath());
     }
@@ -82,9 +82,7 @@ final class RequestTest extends TestCase
             yield ParseResult::item(['::item::']);
         });
 
-        $request->callback(
-            new Response(new GuzzleResponse(), $request),
-        )->next();
+        $request->callback(new Response(new GuzzleResponse(), $request))->next();
 
         self::assertTrue($called);
     }
@@ -123,9 +121,7 @@ final class RequestTest extends TestCase
     {
         $request = $this->makeRequest('https://example.com/path#anchor');
 
-        self::assertTrue(
-            $request->url->equals('https://example.com/path#anchor'),
-        );
+        self::assertTrue($request->url->equals('https://example.com/path#anchor'));
     }
 
     protected function createDroppable(): DroppableInterface

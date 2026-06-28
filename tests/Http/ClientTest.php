@@ -15,6 +15,7 @@ namespace RoachPHP\Tests\Http;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use RoachPHP\Http\Client;
@@ -31,7 +32,7 @@ final class ClientTest extends TestCase
 
     public function testCallFulfilledCallbackForAllSuccessfulResponses(): void
     {
-        $client = new Client($this->withMockClient([
+        $client = new Client(self::withMockClient([
             $response1 = new \GuzzleHttp\Psr7\Response(200),
             $response2 = new \GuzzleHttp\Psr7\Response(202),
             $response3 = new \GuzzleHttp\Psr7\Response(204),
@@ -58,7 +59,7 @@ final class ClientTest extends TestCase
 
     public function testPassBadResponseExceptionsToFulfilledHandler(): void
     {
-        $client = new Client($this->withMockClient([
+        $client = new Client(self::withMockClient([
             $response = new \GuzzleHttp\Psr7\Response(400),
         ]));
 
@@ -76,12 +77,10 @@ final class ClientTest extends TestCase
         self::assertSame($response, $responses[0]->getResponse());
     }
 
-    /**
-     * @dataProvider exceptionProvider
-     */
+    #[DataProvider('exceptionProvider')]
     public function testCallRejectCallbackOnRequestException(string $exceptionClass, callable $makeException): void
     {
-        $client = new Client($this->withMockClient([
+        $client = new Client(self::withMockClient([
             static fn (RequestInterface $request) => throw $makeException($request),
         ]));
 
@@ -119,12 +118,10 @@ final class ClientTest extends TestCase
         ];
     }
 
-    private function withMockClient(array $handlers): \GuzzleHttp\Client
+    private static function withMockClient(array $handlers): \GuzzleHttp\Client
     {
         return new \GuzzleHttp\Client([
-            'handler' => HandlerStack::create(
-                new MockHandler($handlers),
-            ),
+            'handler' => HandlerStack::create(new MockHandler($handlers)),
         ]);
     }
 }

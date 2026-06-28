@@ -36,9 +36,7 @@ final class ProxyMiddleware implements RequestMiddlewareInterface
     public function handleRequest(Request $request): Request
     {
         if (null === $this->proxy) {
-            $this->logger->warning(
-                '[ProxyMiddleware] No proxy configured for middleware',
-            );
+            $this->logger->warning('[ProxyMiddleware] No proxy configured for middleware');
 
             return $request;
         }
@@ -57,7 +55,7 @@ final class ProxyMiddleware implements RequestMiddlewareInterface
         return $request->addOption('proxy', $options->toArray());
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'proxy' => [],

@@ -49,8 +49,7 @@ final class FetchCommand extends Command
             $request,
         );
 
-        $output->writeln(
-            <<<TEXT
+        $output->writeln(<<<TEXT
 <info>
 Available variables:
     \$response:      <{$response->getStatus()} '{$url}'>
@@ -58,8 +57,7 @@ Available variables:
 Commands:
     fetch <url>     Fetch URL and update the \$response and \$html objects
 </info>
-TEXT
-        );
+TEXT);
 
         /** @var Shell $app */
         $app = $this->getApplication();

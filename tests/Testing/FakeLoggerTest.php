@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Testing;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Testing\FakeLogger;
 
@@ -24,10 +25,9 @@ use RoachPHP\Testing\FakeLogger;
 final class FakeLoggerTest extends TestCase
 {
     /**
-     * @dataProvider logMessageProvider
-     *
      * @param array<array-key, mixed> $context
      */
+    #[DataProvider('logMessageProvider')]
     public function testCheckIfSpecificMessageWasLoggedAtLevel(string $level, string $message, array $context): void
     {
         $logger = new FakeLogger();
@@ -40,10 +40,9 @@ final class FakeLoggerTest extends TestCase
     }
 
     /**
-     * @dataProvider logMessageProvider
-     *
      * @param array<array-key, mixed> $context
      */
+    #[DataProvider('logMessageProvider')]
     public function testCheckIfMessageWasLoggedWithContext(string $level, string $message, array $context): void
     {
         $logger = new FakeLogger();
@@ -86,5 +85,18 @@ final class FakeLoggerTest extends TestCase
                 'emergency', '::emergency-message::', ['::emergency-context::'],
             ],
         ];
+    }
+
+    public function testCountMessages(): void
+    {
+        $logger = new FakeLogger();
+
+        $logger->info('::message::', ['uri' => '::a::']);
+        $logger->info('::message::', ['uri' => '::a::']);
+        $logger->info('::message::', ['uri' => '::b::']);
+
+        self::assertSame(3, $logger->countMessages('info', '::message::'));
+        self::assertSame(2, $logger->countMessages('info', '::message::', ['uri' => '::a::']));
+        self::assertSame(0, $logger->countMessages('error', '::message::'));
     }
 }

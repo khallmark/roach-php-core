@@ -197,15 +197,9 @@ final class QueryTest extends TestCase
             'baz' => ['qux', 'bla'],
         ]);
 
-        self::assertTrue(
-            $query1->equals('foo=bar&baz%5B0%5D=qux&baz%5B1%5D=bla'),
-        );
-        self::assertFalse(
-            $query1->equals('foo=bar&baz%5B0%5D=qux&baz%5B1%5D=derp'),
-        );
-        self::assertFalse(
-            $query1->equals('foo=bar'),
-        );
+        self::assertTrue($query1->equals('foo=bar&baz%5B0%5D=qux&baz%5B1%5D=bla'));
+        self::assertFalse($query1->equals('foo=bar&baz%5B0%5D=qux&baz%5B1%5D=derp'));
+        self::assertFalse($query1->equals('foo=bar'));
     }
 
     public function testComparingForEqualityIgnoresOrderOfParameters(): void

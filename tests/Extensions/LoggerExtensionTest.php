@@ -40,92 +40,68 @@ final class LoggerExtensionTest extends ExtensionTestCase
 
     public function testLogWhenRunStarts(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Run starting'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Run starting'));
 
         $this->dispatch(new RunStarting(new Run([], '::namespace::')), RunStarting::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Run starting'),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Run starting'));
     }
 
     public function testLogWhenRunFinished(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Run finished'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Run finished'));
 
         $this->dispatch(new RunFinished(new Run([], '::namespace::')), RunFinished::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Run finished'),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Run finished'));
     }
 
     public function testLogWhenItemGotDropped(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Item dropped'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Item dropped'));
 
         $item = (new Item(['foo' => 'bar']))->drop('::reason::');
         $this->dispatch(new ItemDropped($item), ItemDropped::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Item dropped', [
-                'item' => $item->all(),
-                'reason' => '::reason::',
-            ]),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Item dropped', [
+            'item' => $item->all(),
+            'reason' => '::reason::',
+        ]), );
     }
 
     public function testLogWhenRequestWasDropped(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Request dropped'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Request dropped'));
 
         $request = $this->makeRequest('::request-url::')->drop('::reason::');
         $this->dispatch(new RequestDropped($request), RequestDropped::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Request dropped', [
-                'uri' => '::request-url::',
-                'reason' => '::reason::',
-            ]),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Request dropped', [
+            'uri' => '::request-url::',
+            'reason' => '::reason::',
+        ]), );
     }
 
     public function testLogWhenRequestWasSent(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Dispatching request'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Dispatching request'));
 
         $request = $this->makeRequest('::request-url::');
         $this->dispatch(new RequestSending($request), RequestSending::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Dispatching request', [
-                'uri' => '::request-url::',
-            ]),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Dispatching request', [
+            'uri' => '::request-url::',
+        ]), );
     }
 
     public function testLogWhenItemWasScraped(): void
     {
-        self::assertFalse(
-            $this->logger->messageWasLogged('info', 'Item scraped'),
-        );
+        self::assertFalse($this->logger->messageWasLogged('info', 'Item scraped'));
 
         $item = new Item(['foo' => 'bar']);
         $this->dispatch(new ItemScraped($item), ItemScraped::NAME);
 
-        self::assertTrue(
-            $this->logger->messageWasLogged('info', 'Item scraped', ['foo' => 'bar']),
-        );
+        self::assertTrue($this->logger->messageWasLogged('info', 'Item scraped', ['foo' => 'bar']));
     }
 
     protected function createExtension(): ExtensionInterface

@@ -25,7 +25,7 @@ final class Extension implements ExtensionInterface
         return [];
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             '::option-key::' => '::default-option-value::',

@@ -34,7 +34,7 @@ final class MaximumCrawlDepthMiddleware implements RequestMiddlewareInterface
         return $request->withMeta('depth', $currentDepth + 1);
     }
 
-    private function defaultOptions(): array
+    private static function defaultOptions(): array
     {
         return [
             'maxCrawlDepth' => 10,

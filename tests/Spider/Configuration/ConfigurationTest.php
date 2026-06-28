@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace RoachPHP\Tests\Spider\Configuration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Spider\Configuration\Configuration;
 use RoachPHP\Spider\Configuration\Overrides;
@@ -29,13 +30,12 @@ use RoachPHP\Tests\Fixtures\ResponseSpiderMiddleware;
 final class ConfigurationTest extends TestCase
 {
     /**
-     * @dataProvider overridesProvider
-     *
      * @param array<string, mixed> $overrides
      */
+    #[DataProvider('overridesProvider')]
     public function testMergeWithOverrides(array $overrides, callable $verifyConfig): void
     {
-        $originalConfig = $this->makeConfiguration([
+        $originalConfig = self::makeConfiguration([
             'startUrls' => ['::original-url::'],
             'spiderMiddleware' => [
                 RequestSpiderMiddleware::class,
@@ -70,42 +70,36 @@ final class ConfigurationTest extends TestCase
                     self::assertEquals(['::override-url::'], $config->startUrls);
                 },
             ],
-
             'override spiderMiddleware' => [
                 ['spiderMiddleware' => [ResponseSpiderMiddleware::class]],
                 static function (Configuration $config): void {
                     self::assertEquals([ResponseSpiderMiddleware::class], $config->spiderMiddleware);
                 },
             ],
-
             'override downloaderMiddleware' => [
                 ['downloaderMiddleware' => [ResponseDownloaderMiddleware::class]],
                 static function (Configuration $config): void {
                     self::assertEquals([ResponseDownloaderMiddleware::class], $config->downloaderMiddleware);
                 },
             ],
-
             'override itemProcessors' => [
                 ['itemProcessors' => []],
                 static function (Configuration $config): void {
                     self::assertEmpty($config->itemProcessors);
                 },
             ],
-
             'override extensions' => [
                 ['extensions' => []],
                 static function (Configuration $config): void {
                     self::assertEmpty($config->extensions);
                 },
             ],
-
             'override concurrency' => [
                 ['concurrency' => 10],
                 static function (Configuration $config): void {
                     self::assertSame(10, $config->concurrency);
                 },
             ],
-
             'override requestDelay' => [
                 ['requestDelay' => 11],
                 static function (Configuration $config): void {
@@ -118,7 +112,7 @@ final class ConfigurationTest extends TestCase
     /**
      * @param array<string, mixed> $values
      */
-    private function makeConfiguration(array $values): Configuration
+    private static function makeConfiguration(array $values): Configuration
     {
         $defaults = [
             'startUrls' => [],

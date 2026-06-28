@@ -15,6 +15,7 @@ namespace RoachPHP\Tests\Core;
 
 use League\Container\Container;
 use League\Container\ReflectionContainer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RoachPHP\Core\Run;
 use RoachPHP\Core\RunFactory;
@@ -48,7 +49,7 @@ final class RunFactoryTest extends TestCase
 
     public function testGetInitialRequestsFromSpider(): void
     {
-        $spider = $this->createSpider(startUrls: ['::url-1::', '::url-2::']);
+        $spider = self::createSpider(startUrls: ['::url-1::', '::url-2::']);
 
         $run = $this->factory->fromSpider($spider);
 
@@ -59,7 +60,7 @@ final class RunFactoryTest extends TestCase
 
     public function testWrapDownloaderMiddlewareInAdapater(): void
     {
-        $spider = $this->createSpider(downloaderMiddleware: [
+        $spider = self::createSpider(downloaderMiddleware: [
             RequestDownloaderMiddleware::class,
             ResponseDownloaderMiddleware::class,
         ]);
@@ -73,7 +74,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureDownloaderMiddlewareWithDefaults(): void
     {
-        $spider = $this->createSpider(downloaderMiddleware: [
+        $spider = self::createSpider(downloaderMiddleware: [
             RequestDownloaderMiddleware::class,
         ]);
 
@@ -87,7 +88,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureDownloaderMiddlewareWithOverrides(): void
     {
-        $spider = $this->createSpider(downloaderMiddleware: [
+        $spider = self::createSpider(downloaderMiddleware: [
             [RequestDownloaderMiddleware::class, ['::option-key::' => '::override-value::']],
         ]);
 
@@ -101,7 +102,7 @@ final class RunFactoryTest extends TestCase
 
     public function testWrapSpiderMiddlewareInAdapter(): void
     {
-        $spider = $this->createSpider(spiderMiddleware: [
+        $spider = self::createSpider(spiderMiddleware: [
             RequestSpiderMiddleware::class,
             ResponseSpiderMiddleware::class,
             ItemSpiderMiddleware::class,
@@ -117,7 +118,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureSpiderMiddlewareWithDefaults(): void
     {
-        $spider = $this->createSpider(spiderMiddleware: [
+        $spider = self::createSpider(spiderMiddleware: [
             RequestSpiderMiddleware::class,
         ]);
 
@@ -131,7 +132,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureSpiderMiddlewareWithOverrides(): void
     {
-        $spider = $this->createSpider(spiderMiddleware: [
+        $spider = self::createSpider(spiderMiddleware: [
             [RequestSpiderMiddleware::class, ['::option-key::' => '::override-value::']],
         ]);
 
@@ -145,7 +146,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureItemProcessorsWithDefaults(): void
     {
-        $spider = $this->createSpider(itemProcessors: [
+        $spider = self::createSpider(itemProcessors: [
             ItemProcessor::class,
         ]);
 
@@ -159,7 +160,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureItemProcessorsWithOverrides(): void
     {
-        $spider = $this->createSpider(itemProcessors: [
+        $spider = self::createSpider(itemProcessors: [
             [ItemProcessor::class, ['::option-key::' => '::override-value::']],
         ]);
 
@@ -173,7 +174,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureExtensionsWithDefaults(): void
     {
-        $spider = $this->createSpider(extensions: [
+        $spider = self::createSpider(extensions: [
             Extension::class,
         ]);
 
@@ -187,7 +188,7 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureExtensionsWithOverrides(): void
     {
-        $spider = $this->createSpider(extensions: [
+        $spider = self::createSpider(extensions: [
             [Extension::class, ['::option-key::' => '::override-value::']],
         ]);
 
@@ -199,24 +200,20 @@ final class RunFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider numberProvider
-     */
+    #[DataProvider('numberProvider')]
     public function testConfigureConcurrencyWithDefault(int $concurrency): void
     {
-        $spider = $this->createSpider(concurrency: $concurrency);
+        $spider = self::createSpider(concurrency: $concurrency);
 
         $run = $this->factory->fromSpider($spider);
 
         self::assertSame($concurrency, $run->concurrency);
     }
 
-    /**
-     * @dataProvider numberProvider
-     */
+    #[DataProvider('numberProvider')]
     public function testConfigureRequestDelay(int $requestDelay): void
     {
-        $spider = $this->createSpider(requestDelay: $requestDelay);
+        $spider = self::createSpider(requestDelay: $requestDelay);
 
         $run = $this->factory->fromSpider($spider);
 
@@ -236,16 +233,14 @@ final class RunFactoryTest extends TestCase
 
     public function testConfigureRunNamespace(): void
     {
-        $spider = $this->createSpider();
+        $spider = self::createSpider();
 
         $run = $this->factory->fromSpider($spider);
 
         self::assertSame($spider::class, $run->namespace);
     }
 
-    /**
-     * @dataProvider configurationOverrideProvider
-     */
+    #[DataProvider('configurationOverrideProvider')]
     public function testMergeSpiderConfigurationWithRunOverrides(array $overrides, callable $verifyRun): void
     {
         $defaults = [
@@ -270,7 +265,7 @@ final class RunFactoryTest extends TestCase
             'requestDelay' => 5,
             'concurrency' => 2,
         ];
-        $spider = $this->createSpider(...$defaults);
+        $spider = self::createSpider(...$defaults);
 
         $run = $this->factory->fromSpider($spider, new Overrides(...$overrides));
 
@@ -288,14 +283,12 @@ final class RunFactoryTest extends TestCase
                     self::assertSame('::override-url-2::', $run->startRequests[1]->getUri());
                 },
             ],
-
             'override itemProcessors' => [
                 ['itemProcessors' => []],
                 static function (Run $run): void {
                     self::assertEmpty($run->itemProcessors);
                 },
             ],
-
             'override spiderMiddleware' => [
                 ['spiderMiddleware' => [ItemSpiderMiddleware::class]],
                 static function (Run $run): void {
@@ -306,7 +299,6 @@ final class RunFactoryTest extends TestCase
                     );
                 },
             ],
-
             'override downloaderMiddleware' => [
                 ['downloaderMiddleware' => [ResponseDownloaderMiddleware::class]],
                 static function (Run $run): void {
@@ -317,21 +309,18 @@ final class RunFactoryTest extends TestCase
                     );
                 },
             ],
-
             'override extensions' => [
                 ['extensions' => []],
                 static function (Run $run): void {
                     self::assertEmpty($run->extensions);
                 },
             ],
-
             'override concurrency' => [
                 ['concurrency' => 25],
                 static function (Run $run): void {
                     self::assertSame(25, $run->concurrency);
                 },
             ],
-
             'override requestDelay' => [
                 ['requestDelay' => 150],
                 static function (Run $run): void {
@@ -341,7 +330,7 @@ final class RunFactoryTest extends TestCase
         ];
     }
 
-    private function createSpider(
+    private static function createSpider(
         array $startUrls = [],
         array $downloaderMiddleware = [],
         array $spiderMiddleware = [],

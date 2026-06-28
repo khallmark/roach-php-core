@@ -22,14 +22,12 @@ use RoachPHP\Http\Response;
  */
 final class DownloaderMiddlewareAdapter implements DownloaderMiddlewareInterface
 {
-    private function __construct(
-        private RequestMiddlewareInterface|ResponseMiddlewareInterface $middleware,
-    ) {
+    private function __construct(private RequestMiddlewareInterface|ResponseMiddlewareInterface $middleware)
+    {
     }
 
-    public static function fromMiddleware(
-        RequestMiddlewareInterface|ResponseMiddlewareInterface $middleware,
-    ): DownloaderMiddlewareInterface {
+    public static function fromMiddleware(RequestMiddlewareInterface|ResponseMiddlewareInterface $middleware): DownloaderMiddlewareInterface
+    {
         if ($middleware instanceof DownloaderMiddlewareInterface) {
             return $middleware;
         }

@@ -60,15 +60,11 @@ abstract class AbstractItem implements ItemInterface
         try {
             $property = $reflectionClass->getProperty($key);
         } catch (\ReflectionException) {
-            throw new \InvalidArgumentException(
-                \sprintf('No public property %s exists on class %s', $key, static::class),
-            );
+            throw new \InvalidArgumentException(\sprintf('No public property %s exists on class %s', $key, static::class));
         }
 
         if (!$property->isPublic()) {
-            throw new \InvalidArgumentException(
-                \sprintf('No public property %s exists on class %s', $key, static::class),
-            );
+            throw new \InvalidArgumentException(\sprintf('No public property %s exists on class %s', $key, static::class));
         }
 
         $property->setValue($this, $value);

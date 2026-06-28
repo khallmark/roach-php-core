@@ -214,6 +214,60 @@ final class EngineTest extends IntegrationTestCase
         ]));
     }
 
+    public function testRemovesRunExtensionsAfterRunFinishes(): void
+    {
+        $url = 'http://localhost:8000/test1';
+        $loggerA = new FakeLogger();
+        $loggerB = new FakeLogger();
+        $runA = new Run(
+            [$this->makeRequest($url)],
+            '::namespace::',
+            extensions: [new LoggerExtension($loggerA)],
+        );
+        $runB = new Run(
+            [$this->makeRequest($url)],
+            '::namespace::',
+            extensions: [new LoggerExtension($loggerB)],
+        );
+
+        $this->engine->start($runA);
+        $this->engine->start($runB);
+
+        self::assertSame(1, $loggerA->countMessages('info', 'Dispatching request', ['uri' => $url]));
+        self::assertSame(1, $loggerB->countMessages('info', 'Dispatching request', ['uri' => $url]));
+    }
+
+    public function testRemovesRunExtensionsAfterRunFails(): void
+    {
+        $url = 'http://localhost:8000/test1';
+        $loggerA = new FakeLogger();
+        $loggerB = new FakeLogger();
+        $failingRun = new Run(
+            [$this->makeRequest($url, static function (): \Generator {
+                throw new \RuntimeException('::failure::');
+
+                yield from [];
+            })],
+            '::namespace::',
+            extensions: [new LoggerExtension($loggerA)],
+        );
+        $successfulRun = new Run(
+            [$this->makeRequest($url)],
+            '::namespace::',
+            extensions: [new LoggerExtension($loggerB)],
+        );
+
+        try {
+            $this->engine->start($failingRun);
+        } catch (\RuntimeException) {
+        }
+
+        $this->engine->start($successfulRun);
+
+        self::assertSame(1, $loggerA->countMessages('info', 'Dispatching request', ['uri' => $url]));
+        self::assertSame(1, $loggerB->countMessages('info', 'Dispatching request', ['uri' => $url]));
+    }
+
     public function testCollectAndReturnScrapedItems(): void
     {
         $parseCallback = static function () {
